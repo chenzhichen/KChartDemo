@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">KChartDemo</string>
+    <string name="behavior_top_title">com.kchart.demo.TopTitleBehavior</string>
+</resources>
