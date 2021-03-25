@@ -1,105 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.kchart.view.KChartViewGroup xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.kchart.view.KChartView
-        android:id="@+id/kChartView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:tag="Scroll" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="#a0a1ad"
-        android:tag="Scroll" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:tag="Scroll">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <CheckBox
-                android:id="@+id/ma"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:gravity="center"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:text="MA" />
-
-            <CheckBox
-                android:id="@+id/boll"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:gravity="center"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:text="BOLL" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="1px"
-            android:layout_height="20dp"
-            android:layout_gravity="center"
-            android:background="#a0a1ad" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <CheckBox
-                android:id="@+id/vol"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:gravity="center"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:text="VAL" />
-
-            <CheckBox
-                android:id="@+id/macd"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:gravity="center"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:text="MACD" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="#a0a1ad" />
-
-    <TextView
+    <Button
+        android:id="@+id/kchart"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center"
-        android:tag="Bar"
-        android:text="悬停Tab" />
+        android:text="kchart"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rxjava" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="#a0a1ad"
-        android:tag="Bar" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-</com.kchart.view.KChartViewGroup>
+</androidx.constraintlayout.widget.ConstraintLayout>

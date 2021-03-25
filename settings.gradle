@@ -1,2 +1,5 @@
+include ':kchart'
+include ':rxjava'
+include ':base'
 include ':app'
 rootProject.name = "KChartDemo"
