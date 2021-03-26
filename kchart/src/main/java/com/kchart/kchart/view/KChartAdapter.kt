@@ -9,6 +9,7 @@ import kotlin.collections.ArrayList
 class KChartAdapter : BaseKChartAdapter<KLineBean>() {
     private var datas = ArrayList<KLineBean>()
     private var simpleDateFormat: SimpleDateFormat = SimpleDateFormat("MM-dd HH:mm")
+    var addToHeader = false
 
 
     override fun getDate(position: Int): String {
@@ -36,17 +37,19 @@ class KChartAdapter : BaseKChartAdapter<KLineBean>() {
      */
     fun addHeaderData(data: List<KLineBean>) {
         if (data != null && data.isNotEmpty()) {
-            datas.addAll(data)
+            datas.addAll(0, data)
+            addToHeader = true
             notifyDataSetChanged()
+            addToHeader = false
         }
     }
 
     /**
      * 向尾部添加数据
      */
-    fun addFooterData(data: List<KLineBean>?) {
+    fun addFooterData(data: List<KLineBean>) {
         if (data != null && data.isNotEmpty()) {
-            datas.addAll(0, data)
+            datas.addAll(data)
             notifyDataSetChanged()
         }
     }

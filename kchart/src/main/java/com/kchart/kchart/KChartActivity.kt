@@ -50,7 +50,7 @@ class KChartActivity : AppCompatActivity() {
                 data = scanner.next()
             }
         } catch (e: Exception) {
-            e.printStackTrace();
+            e.printStackTrace()
         } finally {
             input?.close()
         }
@@ -66,10 +66,12 @@ class KChartActivity : AppCompatActivity() {
         })
 
         kChartView.setMainChartDraw(mainChartDraw)
-        ma.isChecked = true
-        addMaIndex(true)
-        vol.isChecked = true
-        addVolIndex(true)
+//        ma.isChecked = true
+//        addMaIndex(true)
+//        vol.isChecked = true
+//        addVolIndex(true)
+//        macd.isChecked = true
+//        addMACD(true)
         ma.setOnCheckedChangeListener { _, isChecked ->
             addMaIndex(isChecked)
         }
@@ -82,6 +84,17 @@ class KChartActivity : AppCompatActivity() {
         }
         macd.setOnCheckedChangeListener { _, isChecked ->
             addMACD(isChecked)
+        }
+
+        addHeader.setOnClickListener {
+            var data = ArrayList<KLineBean>()
+            data.add(adapter.getItem(0))
+            adapter.addHeaderData(data)
+        }
+        addFooter.setOnClickListener {
+            var data = ArrayList<KLineBean>()
+            data.add(adapter.getItem(adapter.getCount() - 1))
+            adapter.addFooterData(data)
         }
 
     }

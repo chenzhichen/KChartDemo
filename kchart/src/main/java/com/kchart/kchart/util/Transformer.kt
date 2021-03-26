@@ -2,6 +2,7 @@ package com.kchart.kchart.util
 
 import android.graphics.Matrix
 import android.graphics.RectF
+import kotlin.math.abs
 
 
 class Transformer {
@@ -17,9 +18,9 @@ class Transformer {
 
     private var ptsBuffer = FloatArray(2)
 
-    private var maxScrollOffset = 0f// 最大滚动量
+    var maxScrollOffset = 0f// 最大滚动量
 
-    private var minScrollOffset = 0f// 最小滚动量
+    var minScrollOffset = 0f// 最小滚动量
 
     private var scaleX = 1f
     private var chartWidth = 0f
@@ -27,12 +28,32 @@ class Transformer {
     private var dataSize = 0
 
 
-    fun resetMatrix(viewRect: RectF, count: Int, itemWidth: Float) {
-        if (count <= 0 || viewRect == null || viewRect.width() <= 0 || chartWidth != 0f) {
+    fun resetMatrix(viewRect: RectF, count: Int, itemWidth: Float, addToHeader: Boolean = false) {
+
+        if (count <= 0 || viewRect == null || viewRect.width() <= 0) {
             return
         }
-        chartWidth = viewRect.width()
+        if (dataSize != 0 && dataSize != count) {
+            val difference = abs(count - dataSize)
+            dataSize = count
+            val toFooter = touchValues[Matrix.MTRANS_X] <= -maxScrollOffset
+            computeScrollRange()
+            when {
+                toFooter -> {
+                    transToEnd()
+                }
+                addToHeader -> {
+                    scroll(difference * itemWidth * scaleX)
+                }
+
+            }
+            return
+        }
+        if (chartWidth == itemWidth && dataSize == count) {
+            return
+        }
         dataSize = count
+        chartWidth = viewRect.width()
         this.itemWidth = itemWidth
         val visibleCount = chartWidth / itemWidth.toInt()
         initMatrixValue(chartWidth, count.toFloat())
@@ -66,9 +87,9 @@ class Transformer {
         touchValues = FloatArray(9)
         matrixTouch.reset()
         matrixTouch.postScale(count / visibleCount, 1f)
-
         computeScrollRange()
-        scroll(maxScrollOffset)
+        transToEnd()
+
     }
 
     /**
@@ -143,5 +164,17 @@ class Transformer {
         } else {
             dataSize * itemWidth * scaleX - chartWidth - minScrollOffset
         }
+    }
+
+    private fun transToEnd() {
+        scroll(maxScrollOffset)
+    }
+
+    fun hasToFooter(): Boolean {
+        return touchValues[Matrix.MTRANS_X] <= -maxScrollOffset
+    }
+
+    fun hasToHeader(): Boolean {
+        return touchValues[Matrix.MTRANS_X] >= minScrollOffset
     }
 }

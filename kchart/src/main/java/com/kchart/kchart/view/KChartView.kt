@@ -179,7 +179,8 @@ class KChartView(context: Context, attrs: AttributeSet) : KChartGestureView(cont
             transformer.resetMatrix(
                 mainRect,
                 itemCount,
-                itemWidth
+                itemWidth,
+                getAdapter()!!.addToHeader
             )
         calculateValue()
     }

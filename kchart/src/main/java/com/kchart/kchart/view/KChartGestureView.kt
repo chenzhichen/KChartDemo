@@ -27,6 +27,7 @@ abstract class KChartGestureView(context: Context, attrs: AttributeSet) : View(c
 
     private var isLongPress = false
 
+
     private var scaleXMax = 5f
 
     private var scaleXMin = 0.5f
@@ -46,7 +47,6 @@ abstract class KChartGestureView(context: Context, attrs: AttributeSet) : View(c
         isMultipleTouch = event.pointerCount >= 2
         when (event.action and event.actionMasked) {
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                lastFlingX = 0f
                 isLongPress = false
                 longPressEvent?.isLongPress = isLongPress
             }
@@ -60,7 +60,8 @@ abstract class KChartGestureView(context: Context, attrs: AttributeSet) : View(c
             }
 
             MotionEvent.ACTION_DOWN -> {
-                if (!overScroller.isFinished) overScroller.abortAnimation()
+                lastFlingX = 0f
+                overScroller.abortAnimation()
             }
 
             MotionEvent.ACTION_MOVE -> {
@@ -93,17 +94,19 @@ abstract class KChartGestureView(context: Context, attrs: AttributeSet) : View(c
             }
 
         }
-        gestureDetector.onTouchEvent(event)
-        return true
+        return gestureDetector.onTouchEvent(event)
     }
 
 
     override fun computeScroll() {
         if (overScroller.computeScrollOffset()) {
-            val x: Float = overScroller.currX.toFloat()
-            val dx: Float = x - lastFlingX
+            val x = overScroller.currX.toFloat()
+            val dx = x - lastFlingX
             lastFlingX = x
             scrollTo(dx)
+            if (transformer.hasToHeader() || transformer.hasToFooter()) {
+                overScroller.abortAnimation()
+            }
         }
     }
 
@@ -170,11 +173,22 @@ abstract class KChartGestureView(context: Context, attrs: AttributeSet) : View(c
                 return false
             }
             blockParentEvent()
-            overScroller.fling(
-                0, 0,
-                (-velocityX).toInt(), 0, Int.MIN_VALUE, Int.MAX_VALUE, Int.MIN_VALUE, Int.MAX_VALUE
-            )
-            return true
+            lastFlingX = 0f
+            if (!transformer.hasToFooter() && !transformer.hasToHeader()) {
+                overScroller.fling(
+                    0,
+                    0,
+                    (-velocityX).toInt(),
+                    0,
+                    Int.MIN_VALUE,
+                    Int.MAX_VALUE,
+                    0,
+                    0
+                )
+                invalidate()
+                return true
+            }
+            return false
         }
 
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
@@ -204,9 +218,7 @@ abstract class KChartGestureView(context: Context, attrs: AttributeSet) : View(c
 
 
     private fun blockParentEvent() {
-        if (parent != null) {
-            parent.requestDisallowInterceptTouchEvent(true)
-        }
+        parent?.requestDisallowInterceptTouchEvent(true)
     }
 
     private fun getPointIndex(x: Float): Int {
