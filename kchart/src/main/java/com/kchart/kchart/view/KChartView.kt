@@ -328,6 +328,10 @@ class KChartView(context: Context, attrs: AttributeSet) : KChartGestureView(cont
         requestLayout()
     }
 
+    fun getChildChartDraw(key: String): ChartDraw? {
+        return childChartDraw[key]
+    }
+
     fun removeChildChartDraw(key: String) {
         childChartDraw.remove(key)
         childRect.remove(key)

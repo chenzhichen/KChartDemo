@@ -10,6 +10,7 @@ class KChartAdapter : BaseKChartAdapter<KLineBean>() {
     private var datas = ArrayList<KLineBean>()
     private var simpleDateFormat: SimpleDateFormat = SimpleDateFormat("MM-dd HH:mm")
     var addToHeader = false
+    var calculationListener: CalculationListener? = null
 
 
     override fun getDate(position: Int): String {
@@ -38,6 +39,7 @@ class KChartAdapter : BaseKChartAdapter<KLineBean>() {
     fun addHeaderData(data: List<KLineBean>) {
         if (data != null && data.isNotEmpty()) {
             datas.addAll(0, data)
+            calculationListener?.calculate()
             addToHeader = true
             notifyDataSetChanged()
             addToHeader = false
@@ -50,6 +52,7 @@ class KChartAdapter : BaseKChartAdapter<KLineBean>() {
     fun addFooterData(data: List<KLineBean>) {
         if (data != null && data.isNotEmpty()) {
             datas.addAll(data)
+            calculationListener?.calculate()
             notifyDataSetChanged()
         }
     }
@@ -82,6 +85,8 @@ class KChartAdapter : BaseKChartAdapter<KLineBean>() {
     fun setDateFormat(dateFormat: String) {
         simpleDateFormat = SimpleDateFormat(dateFormat)
     }
+
+
 
 
 }

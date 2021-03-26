@@ -13,10 +13,7 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.kchart.kchart.data.BarEntry
 import com.kchart.kchart.data.KLineBean
 import com.kchart.kchart.data.LineEntry
-import com.kchart.kchart.view.IValueFormatter
-import com.kchart.kchart.view.IndexChartDraw
-import com.kchart.kchart.view.KChartAdapter
-import com.kchart.kchart.view.MainChartDraw
+import com.kchart.kchart.view.*
 import com.kchart.main.initKLineMA
 import com.kchart.main.initVol
 import com.kchart.main.initVolMA
@@ -66,12 +63,12 @@ class KChartActivity : AppCompatActivity() {
         })
 
         kChartView.setMainChartDraw(mainChartDraw)
-//        ma.isChecked = true
-//        addMaIndex(true)
-//        vol.isChecked = true
-//        addVolIndex(true)
-//        macd.isChecked = true
-//        addMACD(true)
+        ma.isChecked = true
+        addMaIndex(true)
+        vol.isChecked = true
+        addVolIndex(true)
+        macd.isChecked = true
+        addMACD(true)
         ma.setOnCheckedChangeListener { _, isChecked ->
             addMaIndex(isChecked)
         }
@@ -95,6 +92,29 @@ class KChartActivity : AppCompatActivity() {
             var data = ArrayList<KLineBean>()
             data.add(adapter.getItem(adapter.getCount() - 1))
             adapter.addFooterData(data)
+        }
+
+        adapter.calculationListener = object : CalculationListener {
+            override fun calculate() {
+                computerIndex()
+            }
+
+        }
+
+    }
+
+    fun computerIndex() {
+        if (vol.isChecked) {
+            computerVolIndex(kChartView.getChildChartDraw("val") as IndexChartDraw)
+        }
+        if (ma.isChecked) {
+            computerMaIndex()
+        }
+        if (boll.isChecked) {
+            computerBOLL()
+        }
+        if (macd.isChecked) {
+            computerMACDIndex(kChartView.getChildChartDraw("macd") as IndexChartDraw)
         }
 
     }
@@ -150,6 +170,11 @@ class KChartActivity : AppCompatActivity() {
                 }
             }
         })
+        computerVolIndex(volChartDraw)
+        kChartView.addChildChartDraw("val", volChartDraw)
+    }
+
+    private fun computerVolIndex(volChartDraw: IndexChartDraw) {
         volChartDraw.barData["量(5,10)"] = initVol(adapter.getDatas())
         val volLineMap = LinkedHashMap<String, ArrayList<LineEntry>>()
         volLineMap["MA5"] =
@@ -165,7 +190,6 @@ class KChartActivity : AppCompatActivity() {
                 Color.parseColor("#fca044")
             )
         volChartDraw.lineData[""] = volLineMap
-        kChartView.addChildChartDraw("val", volChartDraw)
     }
 
     private fun addMaIndex(add: Boolean) {
@@ -174,6 +198,11 @@ class KChartActivity : AppCompatActivity() {
             kChartView.calculateValue()
             return
         }
+        computerMaIndex()
+        kChartView.calculateValue()
+    }
+
+    private fun computerMaIndex() {
         val lineMap = LinkedHashMap<String, ArrayList<LineEntry>>()
         lineMap["MA(5)"] =
             initKLineMA(
@@ -201,7 +230,6 @@ class KChartActivity : AppCompatActivity() {
                 Color.parseColor("#DE4D42")
             )
         mainChartDraw.lineData[""] = lineMap
-        kChartView.calculateValue()
     }
 
     private fun addBOLL(add: Boolean) {
@@ -210,6 +238,11 @@ class KChartActivity : AppCompatActivity() {
             kChartView.calculateValue()
             return
         }
+        computerBOLL()
+        kChartView.calculateValue()
+    }
+
+    private fun computerBOLL() {
         val UPs = ArrayList<Float>()
         val MBs = ArrayList<Float>()
         val DNs = ArrayList<Float>()
@@ -268,7 +301,6 @@ class KChartActivity : AppCompatActivity() {
         lineMap["UP"] = bollDataUP
         lineMap["LOW"] = bollDataDN
         mainChartDraw.lineData["BOLL(20,2)"] = lineMap
-        kChartView.calculateValue()
     }
 
     private fun getMA(i: Int, kLineBeens: List<KLineBean>, n: Int): Float {
@@ -290,6 +322,12 @@ class KChartActivity : AppCompatActivity() {
             kChartView.removeChildChartDraw("macd")
             return
         }
+        val macdChartDraw = IndexChartDraw()
+        computerMACDIndex(macdChartDraw)
+        kChartView.addChildChartDraw("macd", macdChartDraw)
+    }
+
+    private fun computerMACDIndex(macdChartDraw: IndexChartDraw) {
         val DEAs = java.util.ArrayList<Float>()
         val DIFs = java.util.ArrayList<Float>()
         val MACDs = java.util.ArrayList<Float>()
@@ -349,7 +387,7 @@ class KChartActivity : AppCompatActivity() {
             macdlineData.add(LineEntry(-1, macd, color3))
         }
 
-        val macdChartDraw = IndexChartDraw()
+
         macdChartDraw.maxValueFactor = 0.03f
         macdChartDraw.minValueFactor = 0.03f
         macdChartDraw.setYValueFormatter(object : IValueFormatter {
@@ -364,6 +402,5 @@ class KChartActivity : AppCompatActivity() {
         macdChartDraw.lineData[""] = macdLineMap
         macdChartDraw.barData["MACD(12,26,9)"] = macdData
         macdChartDraw.isMACD = true
-        kChartView.addChildChartDraw("macd", macdChartDraw)
     }
 }
