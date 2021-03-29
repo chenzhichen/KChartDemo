@@ -38,7 +38,7 @@ class MainChartDraw : IndexChartDraw() {
         val lastPositionX = view.transformer.valueToPixels(lastPosition.toFloat())
         canvas.save()
         canvas.clipRect(rect)
-        drawCandle(view, canvas, currentPointX, view.getAdapter()!!.getItem(curPosition), rect)
+        drawCandle(view, canvas, currentPointX, view.adapter.getItem(curPosition), rect)
         drawLine(
             canvas,
             linePaint,
@@ -54,12 +54,12 @@ class MainChartDraw : IndexChartDraw() {
 
 
     override fun getMaxValue(position: Int, view: KChartView): Float {
-        var kLineBean = view.getAdapter()!!.getItem(position)
+        var kLineBean = view.adapter.getItem(position)
         return max(kLineBean.high, getLineDataMaxValue(position))
     }
 
     override fun getMinValue(position: Int, view: KChartView): Float {
-        var kLineBean = view.getAdapter()!!.getItem(position)
+        var kLineBean = view.adapter.getItem(position)
         return min(kLineBean.low, getLineDataMinValue(position))
     }
 
@@ -160,18 +160,18 @@ class MainChartDraw : IndexChartDraw() {
         }
     }
 
-    override fun drawXValue(
+    fun drawXValue(
         view: KChartView,
         canvas: Canvas,
         rect: RectF,
         current: Int
     ) {
-        if (current == 0 || current == view.getAdapter()!!.getCount()
+        if (current == 0 || current == view.adapter.getCount()
             || current % view.transformer.getInterval() !== 0
         ) {
             return
         }
-        var time = view.getAdapter()!!.getDate(current)
+        var time = view.adapter.getDate(current)
         val width = measureTextWidth(time, timeTextPaint)
         canvas.drawText(
             time,
@@ -194,7 +194,7 @@ class MainChartDraw : IndexChartDraw() {
 
         if (longPressEvent != null) {
             var position = longPressEvent.position
-            val kLineBean = view.getAdapter()!!.getItem(position)
+            val kLineBean = view.adapter.getItem(position)
             val time = simpleDateFormat.format(Date(kLineBean.date))
             canvas.drawText(time, x, y, indexTextPaint)
             x += measureTextWidth(time, indexTextPaint) + dpToPx(5f)
@@ -268,7 +268,7 @@ class MainChartDraw : IndexChartDraw() {
         canvas.drawLine(x, 0f, x, view.viewHeight, pressLinePaint)
         indexBackgroundRect.top = rect.bottom
         indexBackgroundRect.bottom = rect.bottom + view.timeRectHeight
-        val time = simpleDateFormat.format(Date(view.getAdapter()!!.getData()[position].date))
+        val time = simpleDateFormat.format(Date(view.adapter.getData()[position].date))
         val with = measureTextWidth(time, yTextPaint)
         indexBackgroundRect.left = (x - with / 2).toInt() - dpToPx(5f)
         indexBackgroundRect.right = (x + with / 2).toInt() + dpToPx(5f)

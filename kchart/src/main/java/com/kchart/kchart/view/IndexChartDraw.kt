@@ -167,7 +167,7 @@ open class IndexChartDraw : ChartDraw() {
         if ((e.y >= rect.top && e.y <= rect.bottom) || view.isLocking) {
             if (view.isLocking) {
                 e.y = view.getViewY(
-                    view.getAdapter()!!.getData()[e.position].close,
+                    view.adapter.getData()[e.position].close,
                     maxValue,
                     viewScaleY,
                     rect.top
@@ -202,8 +202,6 @@ open class IndexChartDraw : ChartDraw() {
         }
     }
 
-    override fun drawXValue(view: KChartView, canvas: Canvas, rect: RectF, current: Int) {
-    }
 
     private fun drawVolIndexText(
         x: Float,

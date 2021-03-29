@@ -2,6 +2,7 @@ package com.kchart.kchart
 
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,8 +31,6 @@ import kotlin.math.sqrt
 @Route(path = RouteList.KChartActivity)
 class KChartActivity : AppCompatActivity() {
     private var format = DecimalFormat("##.#")
-    private var adapter = KChartAdapter()
-    private val mainChartDraw = MainChartDraw()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,18 +50,15 @@ class KChartActivity : AppCompatActivity() {
         } finally {
             input?.close()
         }
-        adapter.setDatas(parseData(data))
-        kChartView.setAdapter(adapter)
+        kChartView.adapter.setDatas(parseData(data))
 
-        mainChartDraw.minValueFactor = 0.05f
-        mainChartDraw.setYValueFormatter(object : IValueFormatter {
+        kChartView.mainChartDraw.minValueFactor = 0.05f
+        kChartView.mainChartDraw.setYValueFormatter(object : IValueFormatter {
             override fun format(value: Float): String {
                 return String.format("%.2f", value)
             }
 
         })
-
-        kChartView.setMainChartDraw(mainChartDraw)
         ma.isChecked = true
         addMaIndex(true)
         vol.isChecked = true
@@ -85,16 +81,16 @@ class KChartActivity : AppCompatActivity() {
 
         addHeader.setOnClickListener {
             var data = ArrayList<KLineBean>()
-            data.add(adapter.getItem(0))
-            adapter.addHeaderData(data)
+            data.add(kChartView.adapter.getItem(0))
+            kChartView.adapter.addHeaderData(data)
         }
         addFooter.setOnClickListener {
             var data = ArrayList<KLineBean>()
-            data.add(adapter.getItem(adapter.getCount() - 1))
-            adapter.addFooterData(data)
+            data.add(kChartView.adapter.getItem(kChartView.adapter.getCount() - 1))
+            kChartView.adapter.addFooterData(data)
         }
 
-        adapter.calculationListener = object : CalculationListener {
+        kChartView.adapter.calculationListener = object : CalculationListener {
             override fun calculate() {
                 computerIndex()
             }
@@ -175,17 +171,17 @@ class KChartActivity : AppCompatActivity() {
     }
 
     private fun computerVolIndex(volChartDraw: IndexChartDraw) {
-        volChartDraw.barData["量(5,10)"] = initVol(adapter.getDatas())
+        volChartDraw.barData["量(5,10)"] = initVol(kChartView.adapter.getDatas())
         val volLineMap = LinkedHashMap<String, ArrayList<LineEntry>>()
         volLineMap["MA5"] =
             initVolMA(
-                adapter.getDatas(),
+                kChartView.adapter.getDatas(),
                 5,
                 Color.parseColor("#DE4D42")
             )
         volLineMap["MA10"] =
             initVolMA(
-                adapter.getDatas(),
+                kChartView.adapter.getDatas(),
                 10,
                 Color.parseColor("#fca044")
             )
@@ -194,7 +190,7 @@ class KChartActivity : AppCompatActivity() {
 
     private fun addMaIndex(add: Boolean) {
         if (!add) {
-            mainChartDraw.lineData.remove("")
+            kChartView.mainChartDraw.lineData.remove("")
             kChartView.calculateValue()
             return
         }
@@ -206,35 +202,35 @@ class KChartActivity : AppCompatActivity() {
         val lineMap = LinkedHashMap<String, ArrayList<LineEntry>>()
         lineMap["MA(5)"] =
             initKLineMA(
-                adapter.getDatas(),
+                kChartView.adapter.getDatas(),
                 5,
                 Color.parseColor("#4b5fe1")
             )
         lineMap["MA(7)"] =
             initKLineMA(
-                adapter.getDatas(),
+                kChartView.adapter.getDatas(),
                 7,
                 Color.parseColor("#6482d9")
             )
         lineMap["MA(10)"] =
             initKLineMA(
-                adapter.getDatas(),
+                kChartView.adapter.getDatas(),
                 10,
                 Color.parseColor("#fca044")
             )
 
         lineMap["MA(25)"] =
             initKLineMA(
-                adapter.getDatas(),
+                kChartView.adapter.getDatas(),
                 25,
                 Color.parseColor("#DE4D42")
             )
-        mainChartDraw.lineData[""] = lineMap
+        kChartView.mainChartDraw.lineData[""] = lineMap
     }
 
     private fun addBOLL(add: Boolean) {
         if (!add) {
-            mainChartDraw.lineData.remove("BOLL(20,2)")
+            kChartView.mainChartDraw.lineData.remove("BOLL(20,2)")
             kChartView.calculateValue()
             return
         }
@@ -253,19 +249,19 @@ class KChartActivity : AppCompatActivity() {
         val n = 20
         val parameter = 2
 
-        for (i in adapter.getDatas().indices) {
-            val point: KLineBean = adapter.getDatas()[i]
+        for (i in kChartView.adapter.getDatas().indices) {
+            val point: KLineBean = kChartView.adapter.getDatas()[i]
             if (i >= n - 1) {
                 var md = 0f
                 for (j in i - n + 1..i) {
-                    val c: Float = adapter.getDatas()[j].close
-                    val m: Float = getMA(i, adapter.getDatas(), n)
+                    val c: Float = kChartView.adapter.getDatas()[j].close
+                    val m: Float = getMA(i, kChartView.adapter.getDatas(), n)
                     val value = c - m
                     md += value * value
                 }
                 md /= n
                 md = sqrt(md.toDouble()).toFloat()
-                mb = getMA(i, adapter.getDatas(), n)
+                mb = getMA(i, kChartView.adapter.getDatas(), n)
                 up = mb + parameter * md
                 dn = mb - parameter * md
                 UPs.add(up)
@@ -285,7 +281,7 @@ class KChartActivity : AppCompatActivity() {
         val color2 = Color.GRAY
         val color3 = Color.DKGRAY
 
-        for (i in adapter.getDatas().indices) {
+        for (i in kChartView.adapter.getDatas().indices) {
             if (i >= n - 1) {
                 bollDataUP.add(LineEntry(i, UPs[i], color1))
                 bollDataMB.add(LineEntry(i, MBs[i], color2))
@@ -300,7 +296,7 @@ class KChartActivity : AppCompatActivity() {
         lineMap["MID"] = bollDataMB
         lineMap["UP"] = bollDataUP
         lineMap["LOW"] = bollDataDN
-        mainChartDraw.lineData["BOLL(20,2)"] = lineMap
+        kChartView.mainChartDraw.lineData["BOLL(20,2)"] = lineMap
     }
 
     private fun getMA(i: Int, kLineBeens: List<KLineBean>, n: Int): Float {
@@ -346,9 +342,9 @@ class KChartActivity : AppCompatActivity() {
         var dIF = 0.0f
         var dEA = 0.0f
         var mACD = 0.0f
-        if (adapter.getDatas() != null && adapter.getDatas().size > 0) {
-            for (i in adapter.getDatas().indices) {
-                close = adapter.getDatas()[i].close
+        if (kChartView.adapter.getDatas() != null && kChartView.adapter.getDatas().size > 0) {
+            for (i in kChartView.adapter.getDatas().indices) {
+                close = kChartView.adapter.getDatas()[i].close
                 if (i == 0) {
                     eMA12 = close
                     eMA26 = close
@@ -402,5 +398,7 @@ class KChartActivity : AppCompatActivity() {
         macdChartDraw.lineData[""] = macdLineMap
         macdChartDraw.barData["MACD(12,26,9)"] = macdData
         macdChartDraw.isMACD = true
+
+        Handler().sendEmptyMessageDelayed(2, 2)
     }
 }
