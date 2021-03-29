@@ -26,6 +26,7 @@ class Transformer {
     private var chartWidth = 0f
     private var itemWidth = 0f
     private var dataSize = 0
+    private lateinit var viewRect: RectF
 
 
     fun resetMatrix(viewRect: RectF, count: Int, itemWidth: Float, addToHeader: Boolean = false) {
@@ -55,9 +56,10 @@ class Transformer {
         dataSize = count
         chartWidth = viewRect.width()
         this.itemWidth = itemWidth
+        this.viewRect = viewRect
         val visibleCount = chartWidth / itemWidth.toInt()
         initMatrixValue(chartWidth, count.toFloat())
-        initMatrixOffset(viewRect.left, viewRect.top)
+        initMatrixOffset(viewRect.left, viewRect.top, visibleCount)
         initMatrixTouch(count.toFloat(), visibleCount)
     }
 
@@ -74,9 +76,14 @@ class Transformer {
      *
      * @param offsetY 偏移量 Y
      */
-    private fun initMatrixOffset(offsetX: Float, offsetY: Float) {
+    private fun initMatrixOffset(offsetX: Float, offsetY: Float, visibleCount: Float) {
         matrixOffset.reset()
-        matrixOffset.postTranslate(offsetX, offsetY)
+        if (visibleCount >= dataSize) {
+            matrixOffset.postTranslate(offsetX + itemWidth / 2 * scaleX, offsetY)
+        } else {
+            matrixOffset.postTranslate(offsetX, offsetY)
+        }
+
     }
 
     /**
@@ -157,12 +164,15 @@ class Transformer {
      * 计算当前缩放下，X 轴方向的最小滚动值和最大滚动值
      */
     private fun computeScrollRange() {
-        minScrollOffset = itemWidth / 2 * scaleX
+
         val visibleCount = chartWidth / itemWidth / scaleX
-        maxScrollOffset = if (visibleCount >= dataSize) {
-            0f
+        initMatrixOffset(viewRect.left, viewRect.top, visibleCount)
+        if (visibleCount >= dataSize) {
+            minScrollOffset = 0f
+            maxScrollOffset = 0f
         } else {
-            dataSize * itemWidth * scaleX - chartWidth - minScrollOffset
+            minScrollOffset = itemWidth / 2 * scaleX
+            maxScrollOffset = dataSize * itemWidth * scaleX - chartWidth - minScrollOffset
         }
     }
 
