@@ -61,7 +61,7 @@ abstract class ChartDraw {
     /**
      * 绘制X轴坐标
      */
-    abstract fun drawXValue(view: KChartView, canvas: Canvas, rect: RectF)
+    abstract fun drawXValue(view: KChartView, canvas: Canvas, rect: RectF, current: Int)
 
     /**
      * 获取当前实体中最大的值

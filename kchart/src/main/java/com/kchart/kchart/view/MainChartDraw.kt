@@ -122,10 +122,10 @@ class MainChartDraw : IndexChartDraw() {
     override fun drawGrid(view: KChartView, canvas: Canvas, rect: RectF) {
         canvas.drawLine(0f, 0f, view.viewWidth.toFloat(), 0f, gridLinePaint)
         canvas.drawLine(
-            rect.right.toFloat(),
+            rect.right,
             0f,
-            rect.right.toFloat(),
-            rect.bottom.toFloat(),
+            rect.right,
+            rect.bottom,
             gridLinePaint
         )
 
@@ -163,29 +163,22 @@ class MainChartDraw : IndexChartDraw() {
     override fun drawXValue(
         view: KChartView,
         canvas: Canvas,
-        rect: RectF
+        rect: RectF,
+        current: Int
     ) {
-        var space = rect.right / (view.gridColumns - 1)
-        for (i in 0 until view.gridColumns) {
-            var x = (space * i)
-            var position = view.transformer.pixelsToValue(x).roundToInt()
-            var time =
-                view.getAdapter()!!.getDate(position)
-            val width = measureTextWidth(time, timeTextPaint)
-            when (i) {
-                0 -> x += dpToPx(2f)
-                view.gridColumns - 1 -> x -= width + dpToPx(2f)
-                else -> {
-                    x -= width / 2
-                }
-            }
-            canvas.drawText(
-                time,
-                x,
-                fixTextY(rect.bottom + view.timeRectHeight / 2f, timeTextPaint),
-                timeTextPaint
-            )
+        if (current == 0 || current == view.getAdapter()!!.getCount()
+            || current % view.transformer.getInterval() !== 0
+        ) {
+            return
         }
+        var time = view.getAdapter()!!.getDate(current)
+        val width = measureTextWidth(time, timeTextPaint)
+        canvas.drawText(
+            time,
+            view.transformer.valueToPixels(current.toFloat()) - width / 2,
+            fixTextY(rect.bottom + view.timeRectHeight / 2f, timeTextPaint),
+            timeTextPaint
+        )
     }
 
     override fun drawIndexText(

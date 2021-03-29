@@ -139,7 +139,7 @@ class KChartView(context: Context, attrs: AttributeSet) : KChartGestureView(cont
         mainChartDraw?.drawGrid(this, canvas, mainRect)
         mainChartDraw?.drawYValue(this, canvas, mainRect)
         mainChartDraw?.drawIndexText(this, canvas, mainRect, longPressEvent)
-        mainChartDraw?.drawXValue(this, canvas, mainRect)
+
         childChartDraw.entries.forEach {
             it.value.drawGrid(this, canvas, childRect[it.key]!!)
             it.value.drawYValue(this, canvas, childRect[it.key]!!)
@@ -147,6 +147,7 @@ class KChartView(context: Context, attrs: AttributeSet) : KChartGestureView(cont
         }
         for (i in startIndex..stopIndex) {
             val lastPosition = if (i == 0) 0 else i - 1
+            mainChartDraw?.drawXValue(this, canvas, mainRect, i)
             mainChartDraw?.draw(canvas, this, mainRect, i, lastPosition)
             childChartDraw.entries.forEach {
                 it.value.draw(canvas, this, childRect[it.key]!!, i, lastPosition)

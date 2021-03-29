@@ -202,7 +202,7 @@ open class IndexChartDraw : ChartDraw() {
         }
     }
 
-    override fun drawXValue(view: KChartView, canvas: Canvas, rect: RectF) {
+    override fun drawXValue(view: KChartView, canvas: Canvas, rect: RectF, current: Int) {
     }
 
     private fun drawVolIndexText(

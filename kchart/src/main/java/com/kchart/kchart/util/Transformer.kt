@@ -3,6 +3,7 @@ package com.kchart.kchart.util
 import android.graphics.Matrix
 import android.graphics.RectF
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 
 class Transformer {
@@ -21,7 +22,7 @@ class Transformer {
     var maxScrollOffset = 0f// 最大滚动量
 
     var minScrollOffset = 0f// 最小滚动量
-
+    var visibleCount = 0f
     private var scaleX = 1f
     private var chartWidth = 0f
     private var itemWidth = 0f
@@ -57,18 +58,18 @@ class Transformer {
         chartWidth = viewRect.width()
         this.itemWidth = itemWidth
         this.viewRect = viewRect
-        val visibleCount = chartWidth / itemWidth.toInt()
-        initMatrixValue(chartWidth, count.toFloat())
-        initMatrixOffset(viewRect.left, viewRect.top, visibleCount)
-        initMatrixTouch(count.toFloat(), visibleCount)
+        visibleCount = chartWidth / itemWidth.toInt()
+        initMatrixValue()
+        initMatrixOffset()
+        initMatrixTouch()
     }
 
     /**
      * 初始化值矩阵
      */
-    private fun initMatrixValue(chartWidth: Float, count: Float) {
+    private fun initMatrixValue() {
         matrixValue.reset()
-        matrixValue.postScale(chartWidth / count, 1f)
+        matrixValue.postScale(chartWidth / dataSize, 1f)
     }
 
     /**
@@ -76,12 +77,12 @@ class Transformer {
      *
      * @param offsetY 偏移量 Y
      */
-    private fun initMatrixOffset(offsetX: Float, offsetY: Float, visibleCount: Float) {
+    private fun initMatrixOffset() {
         matrixOffset.reset()
         if (visibleCount >= dataSize) {
-            matrixOffset.postTranslate(offsetX + itemWidth / 2 * scaleX, offsetY)
+            matrixOffset.postTranslate(viewRect.left + itemWidth / 2 * scaleX, viewRect.top)
         } else {
-            matrixOffset.postTranslate(offsetX, offsetY)
+            matrixOffset.postTranslate(viewRect.left, viewRect.top)
         }
 
     }
@@ -90,10 +91,10 @@ class Transformer {
      * 手势滑动缩放矩阵运算
      *
      */
-    private fun initMatrixTouch(count: Float, visibleCount: Float) {
+    private fun initMatrixTouch() {
         touchValues = FloatArray(9)
         matrixTouch.reset()
-        matrixTouch.postScale(count / visibleCount, 1f)
+        matrixTouch.postScale(dataSize / visibleCount, 1f)
         computeScrollRange()
         transToEnd()
 
@@ -146,7 +147,6 @@ class Transformer {
 
     /**
      * 缩放
-     *
      * @param factor  缩放因子
      */
     fun zoom(factor: Float, x: Float) {
@@ -165,8 +165,8 @@ class Transformer {
      */
     private fun computeScrollRange() {
 
-        val visibleCount = chartWidth / itemWidth / scaleX
-        initMatrixOffset(viewRect.left, viewRect.top, visibleCount)
+        visibleCount = chartWidth / itemWidth / scaleX
+        initMatrixOffset()
         if (visibleCount >= dataSize) {
             minScrollOffset = 0f
             maxScrollOffset = 0f
@@ -186,5 +186,9 @@ class Transformer {
 
     fun hasToHeader(): Boolean {
         return touchValues[Matrix.MTRANS_X] >= minScrollOffset
+    }
+
+    fun getInterval(): Int {
+        return (visibleCount / 3).roundToInt()
     }
 }
