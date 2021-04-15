@@ -13,7 +13,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/base" />
             <option value="$PROJECT_DIR$/kchart" />
-            <option value="$PROJECT_DIR$/rxjava" />
+            <option value="$PROJECT_DIR$/redpoint" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

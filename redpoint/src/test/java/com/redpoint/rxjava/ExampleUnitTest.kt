@@ -1,4 +1,4 @@
-package com.rxjava.rxjava
+package com.redpoint.rxjava
 
 import org.junit.Test
 

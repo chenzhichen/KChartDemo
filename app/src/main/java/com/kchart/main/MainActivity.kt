@@ -16,24 +16,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         kchart.setOnClickListener {
             ARouter.getInstance().build(RouteList.KChartActivity)
-                .navigation(this, object : NavigationCallback {
-                    override fun onFound(postcard: Postcard?) {
-                        Log.e("ARouter", "onFound----${postcard.toString()}")
-                    }
-
-                    override fun onLost(postcard: Postcard?) {
-                        Log.e("ARouter", "onLost----${postcard.toString()}")
-                    }
-
-                    override fun onArrival(postcard: Postcard?) {
-                        Log.e("ARouter", "onArrival----${postcard.toString()}")
-                    }
-
-                    override fun onInterrupt(postcard: Postcard?) {
-                        Log.e("ARouter", "onInterrupt----${postcard.toString()}")
-                    }
-
-                })
+                .navigation()
+        }
+        redPoint.setOnClickListener {
+            ARouter.getInstance().build(RouteList.RedPointActivity)
+                .navigation()
         }
     }
 
